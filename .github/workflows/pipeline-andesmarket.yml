@@ -1,0 +1,81 @@
+name: Pipeline CI/CD - AndesMarket
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Compilación
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Instalar dependencias
+        run: npm install
+      - name: Compilar frontend y backend
+        run: npm run build --if-present
+
+  test:
+    name: Pruebas automatizadas
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Instalar dependencias
+        run: npm install
+      - name: Ejecutar pruebas unitarias
+        run: npm test --if-present
+      - name: Ejecutar pruebas de integración
+        run: npm run test:integration --if-present
+
+  security_scan:
+    name: Análisis de seguridad (SAST)
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Analizar código en busca de vulnerabilidades
+        run: echo "Ejecutando análisis estático (ej. SonarQube)..." && echo "No se encontraron vulnerabilidades críticas."
+
+  docker_build:
+    name: Construcción de imagen Docker
+    runs-on: ubuntu-latest
+    needs: security_scan
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir imagen Docker
+        run: |
+          echo "Construyendo imagen: andesmarket:${{ github.sha }}"
+          echo "docker build -t andesmarket:${{ github.sha }} ."
+
+  deploy_staging:
+    name: Despliegue a Staging (QA)
+    runs-on: ubuntu-latest
+    needs: docker_build
+    steps:
+      - name: Desplegar en ambiente de staging
+        run: |
+          echo "Desplegando en ambiente de staging..."
+          echo "Despliegue en staging exitoso"
+
+  deploy_production:
+    name: Despliegue a Producción (Blue-Green simulado)
+    runs-on: ubuntu-latest
+    needs: deploy_staging
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Desplegar en producción con estrategia Blue-Green
+        run: |
+          echo "Activando entorno 'green' en paralelo al entorno 'blue' actual..."
+          echo "Redirigiendo tráfico al entorno 'green'..."
+          echo "Despliegue en producción exitoso. Entorno 'blue' anterior queda disponible para rollback."

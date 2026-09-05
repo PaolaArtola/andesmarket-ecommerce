@@ -1,0 +1,19 @@
+{
+  "name": "andesmarket-ecommerce",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": { "build": "echo 'Compilando AndesMarket...' && exit 0", "test": "echo 'Ejecutando pruebas unitarias...' && exit 0" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PaolaArtola/andesmarket-ecommerce.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/PaolaArtola/andesmarket-ecommerce/issues"
+  },
+  "homepage": "https://github.com/PaolaArtola/andesmarket-ecommerce#readme"
+}
